@@ -1,97 +1,126 @@
-# Job Portal SPA (Frontend-only)
+# Job Portal Application
 
-A professional dark-themed Job Portal built with Vite + React + React Router and vanilla CSS. It fetches initial jobs from a public fake API and persists all client actions in localStorage. No backend or real authentication.
+## Project Overview
+This project is a **frontend-only Job Portal web application** built with **React, Vite, and CSS**.  
+It simulates a job board where **Recruiters can post/manage jobs** and **Job Seekers can view/apply for jobs**.
 
-## Tech Stack
-- Vite + React (JavaScript)
-- React Router v6
-- Vanilla CSS (single global stylesheet)
+The app uses a **dummy jobs API** (`https://jsonfakery.com/jobs`) for initial job listings and relies on **localStorage** to persist user interactions (posted jobs, applied jobs, and role selection).  
 
-## Getting Started
-1. Install dependencies
-   ```bash
-   npm install
-   ```
-2. Start dev server
-   ```bash
-   npm run dev
-   ```
-   The app runs on http://localhost:5173
+The application follows a **dark theme** with a professional look, responsive design, and role-based views for **Recruiter** and **Job Seeker**.  
 
-3. Build for production
-   ```bash
-   npm run build && npm run preview
-   ```
+---
 
 ## Features
-- Recruiter / Job Seeker roles (purely client-side toggle)
-- Fetch initial jobs from https://jsonfakery.com/jobs
-- Normalize and merge API jobs with locally created jobs (local jobs appear first)
-- Persist state to localStorage keys:
-  - `jp_userRole` ("recruiter" | "seeker")
-  - `jp_jobs_custom` (array of recruiter-created jobs)
-  - `jp_applied_job_ids` (array of applied job IDs)
-- Search by title/company (debounced 250ms)
-- Filter by type (All/Full-time/Part-time/Contract)
-- Sort by posted date (Newest/Oldest)
-- Recruiter CRUD: create, edit, delete job postings
-- Job Seeker can apply/withdraw applications
-- Job Detail page with actions based on role
-- Accessible dark theme, responsive layout, subtle micro-animations
 
-## Project Structure
-```
-src/
-  components/      # UI components (Header, Toolbar, Cards, Menus, Toast, Modal)
-  pages/           # Route pages: Landing, PostJob, MyListings, MyJobs, JobDetail
-  hooks/           # Custom hooks (debounce)
-  utils/           # API, storage, formatting helpers
-  App.jsx          # Routes + global shell
-  main.jsx         # App bootstrap
-  styles.css       # Global dark theme styles
+###  Core Features
+- Add, update, delete job postings (Recruiter role).
+- Sort jobs by date posted (Newest/Oldest).
+- View job details with full description.
+- Switch between roles (Recruiter / Job Seeker).
+- Job Seekers can apply to jobs and see their applications.
+- Search & Filter jobs (by title/company and job type).
+
+### Additional Features
+- **“New” tag** for jobs created by recruiters.
+- **Kebab menu (⋮)** for recruiters to edit/delete their own jobs.
+- **Relative dates** (e.g., “3d ago”).
+- **Responsive grid layout** for listings.
+- **Accessible dark theme** with good contrast and keyboard navigation.
+
+---
+
+## Tech Stack
+
+- **React (Vite + JSX)** → fast and modular SPA setup.  
+- **React Router** → page navigation (`/`, `/post`, `/my-listings`, `/my-jobs`, `/job/:id`).  
+- **CSS (custom)** → dark theme, responsive grid, hover states, consistent typography.  
+- **LocalStorage** → persist recruiter’s jobs, applied jobs, and role state.  
+- **Fetch API** → pull jobs from `jsonfakery.com`.  
+
+---
+
+## Pages
+
+- **Landing Page (`/`)** – Default Job Seeker page, search, filter, sort, listings grid.
+- **Post Job (`/post`)** – Recruiter form to create a new job posting.
+- **My Listings (`/my-listings`)** – Recruiter’s posted jobs with Edit/Delete options.
+- **My Jobs (`/my-jobs`)** – Job Seeker’s applied jobs with Withdraw option.
+- **Job Detail (`/job/:id`)** – Full job description with Apply/Withdraw or Edit/Delete.
+
+---
+
+## Why Seeker is the Default Role
+
+The majority of users in any job portal are **Job Seekers** rather than recruiters.  
+By defaulting to the **Seeker role** on landing:
+- First-time visitors instantly see job listings without setup.  
+- It aligns with real-world usage patterns (most users come to apply, not to post).  
+- It reduces friction and improves onboarding for the majority group.  
+
+Recruiters can easily switch roles using the role selector in the header.  
+
+---
+
+## UI/UX Design Decisions
+
+- **Dark Theme**: Gives the app a professional, modern feel with high contrast and accessibility.  
+- **Responsive Layout**: Job cards adapt to 1–3 columns depending on screen size.  
+- **Intuitive Navigation**:  
+  - Header always visible with role switcher and actions dropdown.  
+  - Clear separation of Recruiter vs Seeker features.  
+- **Interactive Feedback**:  
+  - Hover effects guide users without clutter.  
+  - Toasts/confirmation messages ensure users understand their actions.  
+- **Accessible Design**: Keyboard-friendly dropdowns, visible focus outlines, and WCAG-compliant contrasts.  
+
+Together, these choices make the application **easy to follow, intuitive for first-time users, and scalable for more advanced features in the future**.  
+
+---
+
+## Installation & Usage
+
+```bash
+# Clone the project
+git clone <repo_url>
+cd job-portal
+
+# Install dependencies
+npm install
+
+# Run locally
+npm run dev
+
+# Build for production
+npm run build
 ```
 
-## Data Model & Normalization
-Jobs are normalized to:
-```
-{
-  id: string,
-  title: string,
-  company: string,
-  type: 'Full-time' | 'Part-time' | 'Contract',
-  location: string,
-  postedAt: ISOString,
-  description: string,
-  salary?: string,
-  source: 'api' | 'custom'
-}
-```
-- Custom jobs created in-app get `source: 'custom'` and an id like `local_<timestamp>`.
-- For the current session, newly created jobs show a transient "New" tag (not persisted).
-
-## Routing
-- `/` Landing (Job Seeker default view)
-- `/post` New Job Posting (Recruiter) — same form used for editing via `?id=<jobId>`
-- `/my-listings` My Job Listings (Recruiter)
-- `/my-jobs` My Jobs / Applications (Job Seeker)
-- `/job/:id` Job Detail (Both roles)
-
-## Key Decisions
-- Single global CSS for simplicity and performance; CSS Modules could be added later if needed.
-- localStorage used as the durable store; React state is the immediate UI source of truth.
-- When API fetch fails, an inline error is shown with Retry, and local job creation remains fully functional.
-- Edit flow reuses the Post form via `?id=` prefill.
+---
 
 ## Limitations
-- No backend or authentication. Role switch only changes the UI controls.
-- No pagination or infinite scroll.
-- API schema is assumed; `utils/format.js` normalizes fields defensively.
-- Basic optimistic UI without complex error handling for storage quota or network flakiness.
 
-## Accessibility
-- High-contrast dark theme.
-- Focus styles for interactive controls.
-- ARIA attributes for menus, modals, toasts where appropriate.
+- No backend: Jobs and applications are only saved in localStorage.  
+- Roles are client-side only (no real authentication).  
+- API data is mock/fake and may differ in schema.  
+- Search/filter/sort are simple and not optimized for large datasets.  
 
-## Credits
-- Fake jobs API: https://jsonfakery.com/jobs
+---
+
+## Future Improvements
+
+- Add real backend (Node.js + MongoDB/Express).  
+- Implement authentication (JWT-based).  
+- Add resume upload for applicants.  
+- Pagination or infinite scroll for jobs.  
+- Unit tests (React Testing Library / Jest).  
+
+---
+
+## Conclusion
+
+This project demonstrates:  
+- Building a **multi-page React SPA** with role-based UI.  
+- Integrating a **public API** with local state management.  
+- Implementing **CRUD operations** on local data.  
+- Designing a **dark-themed, responsive, intuitive UI/UX**.  
+
+It fulfills the assignment requirements while also showing attention to **real-world user behavior** and **user-centered design principles**.
